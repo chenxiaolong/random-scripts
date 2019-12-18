@@ -1,7 +1,5 @@
 [CmdletBinding(DefaultParameterSetName='noOutPath')]
 param (
-    # Video delay relative to audio
-    [string]$delay = '0.15',
     # Starting timestamp
     [Parameter(Mandatory=$true)]
     [string]$start,
@@ -138,13 +136,8 @@ if ($end) {
 
 $args =
     $timestampArgs +
-    @('-i', $path) +
-    $timestampArgs +
     @(
-        '-itsoffset', $delay,
         '-i', $path,
-        '-map', '1:v',
-        '-map', '0:a',
         '-c', 'copy',
         '-avoid_negative_ts', '1',
         $outPath

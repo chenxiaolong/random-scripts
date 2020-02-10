@@ -84,8 +84,8 @@ function Test-PathsEqual {
     )
 
     try {
-        $info1 = [Native]::GetFileInformation((Resolve-Path -Path $path1).Path)
-        $info2 = [Native]::GetFileInformation((Resolve-Path -Path $path2).Path)
+        $info1 = [Native]::GetFileInformation((Resolve-Path -LiteralPath $path1).Path)
+        $info2 = [Native]::GetFileInformation((Resolve-Path -LiteralPath $path2).Path)
 
         return $info1.VolumeSerialNumber -eq $info2.VolumeSerialNumber -and
                 $info1.FileIndexLow -eq $info2.FileIndexLow -and

@@ -38,7 +38,26 @@ param (
     # Rank
     [Parameter(ParameterSetName='noOutPath', Mandatory=$true)]
     [ValidatePattern('^([A-F]|S{1,3})$')]
-    [string]$rank
+    [string]$rank,
+    # Modifiers
+    # - Score-impacting modifiers:
+    #   - DA - Disappearing Arrows
+    #   - FS - Faster Song
+    #   - GN - Ghost Notes
+    #   - NA - No Arrows
+    #   - NB - No Bombs
+    #   - NF - No Fail
+    #   - NO - No Obstacles
+    #   - SS - Slower Song
+    # - Non-score-impacting modifiers:
+    #   - BE - Battery Energy
+    #   - IF - Insta Fail
+    # - Player settings:
+    #   - LH - Left Handed
+    #   - SL - Static Lights
+    [Parameter(ParameterSetName='noOutPath')]
+    [ValidatePattern('^(BE|DA|FS|GN|IF|LH|N[ABFO]|S[LS])$')]
+    [string[]]$modifiers
 )
 
 $ErrorActionPreference = 'Stop'
@@ -109,6 +128,11 @@ if (!$outPath) {
         throw 'Date or time not provided and could not be determined from input filename'
     }
 
+    $difficultyStr = $difficulty
+    if ($modifiers) {
+        $difficultyStr += " - $(($modifiers | Sort-Object) -join ', ')"
+    }
+
     $missesStr = switch ($misses) {
         { $_ -lt 0 } { 'Failed' }
         0 { 'Full Combo' }
@@ -119,10 +143,10 @@ if (!$outPath) {
     $artistStr = if ($artist) {
         "$artist - "
     } else {
-        ""
+        ''
     }
 
-    $outPath = Join-Path $outDir "$date - $time - $artistStr$song ($difficulty) - $missesStr - $rank.mkv"
+    $outPath = Join-Path $outDir "$date - $time - $artistStr$song ($difficultyStr) - $missesStr - $rank.mkv"
 }
 
 if (Test-PathsEqual $path $outPath) {

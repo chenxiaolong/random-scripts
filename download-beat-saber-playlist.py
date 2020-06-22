@@ -93,7 +93,12 @@ def main():
 
     for song in playlist_data['songs']:
         song_hash = song['hash'].lower()
-        print(f"{song_hash} ({song['songName']})")
+        if 'songName' in song:
+            song_name = song['songName']
+        else:
+            song_name = song['name']
+
+        print(f"{song_hash} ({song_name})")
 
         if song_hash in hashes:
             print('- Already exists')

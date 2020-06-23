@@ -131,17 +131,9 @@ if (!$outPath) {
         throw 'Date or time not provided and could not be determined from input filename'
     }
 
-    $difficultyStr = $difficulty
-    if ($modifiers) {
-        $difficultyStr += " - $(($modifiers | Sort-Object) -join ', ')"
-    }
-
-    $missesStr = switch ($misses) {
-        { $_ -lt 0 } { 'Failed' }
-        0 { 'Full Combo' }
-        1 { '1 miss' }
-        default { "$_ misses" }
-    }
+    $components = New-Object System.Collections.ArrayList
+    $components.Add($date)
+    $components.Add($time)
 
     $artistStr = ''
 
@@ -155,11 +147,29 @@ if (!$outPath) {
         $artistStr += "[$mapper]"
     }
     if ($artistStr) {
-        $artistStr += ' - '
+        $components.Add($artistStr)
     }
 
+    $components.Add($song)
 
-    $outPath = Join-Path $outDir "$date - $time - $artistStr$song ($difficultyStr) - $missesStr - $rank.mkv"
+    $difficultyStr = $difficulty
+    if ($modifiers) {
+        $difficultyStr += " - $(($modifiers | Sort-Object) -join ', ')"
+    }
+
+    $components.Add($difficultyStr)
+
+    $missesStr = switch ($misses) {
+        { $_ -lt 0 } { 'Failed' }
+        0 { 'Full Combo' }
+        1 { '1 miss' }
+        default { "$_ misses" }
+    }
+
+    $components.Add($missesStr)
+    $components.Add($rank)
+
+    $outPath = Join-Path $outDir "$($components -join ' - ').mkv"
 }
 
 if (Test-PathsEqual $path $outPath) {

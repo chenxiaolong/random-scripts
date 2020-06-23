@@ -25,6 +25,9 @@ param (
     # Artist
     [Parameter(ParameterSetName='noOutPath')]
     [string]$artist,
+    # Mapper
+    [Parameter(ParameterSetName='noOutPath')]
+    [string]$mapper,
     # Song
     [Parameter(ParameterSetName='noOutPath', Mandatory=$true)]
     [string]$song,
@@ -140,11 +143,21 @@ if (!$outPath) {
         default { "$_ misses" }
     }
 
-    $artistStr = if ($artist) {
-        "$artist - "
-    } else {
-        ''
+    $artistStr = ''
+
+    if ($artist) {
+        $artistStr += $artist
     }
+    if ($mapper) {
+        if ($artistStr) {
+            $artistStr += ' '
+        }
+        $artistStr += "[$mapper]"
+    }
+    if ($artistStr) {
+        $artistStr += ' - '
+    }
+
 
     $outPath = Join-Path $outDir "$date - $time - $artistStr$song ($difficultyStr) - $missesStr - $rank.mkv"
 }

@@ -132,8 +132,8 @@ if (!$outPath) {
     }
 
     $components = New-Object System.Collections.ArrayList
-    $components.Add($date)
-    $components.Add($time)
+    $components.Add($date) | Out-Null
+    $components.Add($time) | Out-Null
 
     $artistStr = ''
 
@@ -147,17 +147,17 @@ if (!$outPath) {
         $artistStr += "[$mapper]"
     }
     if ($artistStr) {
-        $components.Add($artistStr)
+        $components.Add($artistStr) | Out-Null
     }
 
-    $components.Add($song)
+    $components.Add($song) | Out-Null
 
     $difficultyStr = $difficulty
     if ($modifiers) {
         $difficultyStr += " - $(($modifiers | Sort-Object) -join ', ')"
     }
 
-    $components.Add($difficultyStr)
+    $components.Add($difficultyStr) | Out-Null
 
     $missesStr = switch ($misses) {
         { $_ -lt 0 } { 'Failed' }
@@ -166,8 +166,8 @@ if (!$outPath) {
         default { "$_ misses" }
     }
 
-    $components.Add($missesStr)
-    $components.Add($rank)
+    $components.Add($missesStr) | Out-Null
+    $components.Add($rank) | Out-Null
 
     $outPath = Join-Path $outDir "$($components -join ' - ').mkv"
 }

@@ -33,7 +33,7 @@ param (
     [string]$song,
     # Level type
     [Parameter(ParameterSetName='noOutPath', Mandatory=$true)]
-    [ValidatePattern('^(((90|360)°|One Handed) )?(Easy|Normal|Hard|Expert\+?)$')]
+    [ValidatePattern('^(((90|360)°|One Handed|Lawless) )?(Easy|Normal|Hard|Expert\+?)$')]
     [string]$difficulty,
     # Misses
     [Parameter(ParameterSetName='noOutPath', Mandatory=$true)]

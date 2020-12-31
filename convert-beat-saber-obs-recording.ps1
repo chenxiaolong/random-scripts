@@ -12,34 +12,44 @@ param (
     [parameter(ParameterSetName='haveOutPath')]
     [string]$outPath,
     # Target directory
-    [parameter(ParameterSetName='noOutPath')]
+    [parameter(ParameterSetName='noOutPathWithBsr')]
+    [parameter(ParameterSetName='noOutPathNoBsr')]
     [string]$outDir = '.',
     # Date (guess if not provided)
-    [parameter(ParameterSetName='noOutPath')]
+    [parameter(ParameterSetName='noOutPathWithBsr')]
+    [parameter(ParameterSetName='noOutPathNoBsr')]
     [ValidatePattern('^\d{4}-\d{2}-\d{2}$')]
     [string]$date,
     # Hour (guess if not provided)
-    [parameter(ParameterSetName='noOutPath')]
+    [parameter(ParameterSetName='noOutPathWithBsr')]
+    [parameter(ParameterSetName='noOutPathNoBsr')]
     [ValidatePattern('^\d{2}$')]
     [string]$time,
+    # BSR ID
+    [parameter(ParameterSetName='noOutPathWithBsr', Mandatory=$true)]
+    [ValidatePattern('^[0-9a-fA-F]+$')]
+    [string]$bsrId,
     # Artist
-    [Parameter(ParameterSetName='noOutPath')]
+    [parameter(ParameterSetName='noOutPathNoBsr')]
     [string]$artist,
     # Mapper
-    [Parameter(ParameterSetName='noOutPath')]
+    [parameter(ParameterSetName='noOutPathNoBsr')]
     [string]$mapper,
     # Song
-    [Parameter(ParameterSetName='noOutPath', Mandatory=$true)]
+    [Parameter(ParameterSetName='noOutPathNoBsr', Mandatory=$true)]
     [string]$song,
     # Level type
-    [Parameter(ParameterSetName='noOutPath', Mandatory=$true)]
+    [parameter(ParameterSetName='noOutPathWithBsr', Mandatory=$true)]
+    [parameter(ParameterSetName='noOutPathNoBsr', Mandatory=$true)]
     [ValidatePattern('^(((90|360)°|One Handed|Lawless) )?(Easy|Normal|Hard|Expert\+?)$')]
     [string]$difficulty,
     # Misses
-    [Parameter(ParameterSetName='noOutPath', Mandatory=$true)]
+    [parameter(ParameterSetName='noOutPathWithBsr', Mandatory=$true)]
+    [parameter(ParameterSetName='noOutPathNoBsr', Mandatory=$true)]
     [int]$misses,
     # Rank
-    [Parameter(ParameterSetName='noOutPath', Mandatory=$true)]
+    [parameter(ParameterSetName='noOutPathWithBsr', Mandatory=$true)]
+    [parameter(ParameterSetName='noOutPathNoBsr', Mandatory=$true)]
     [ValidatePattern('^([A-F]|S{1,3})$')]
     [string]$rank,
     # Modifiers
@@ -58,12 +68,18 @@ param (
     # - Player settings:
     #   - LH - Left Handed
     #   - SL - Static Lights
-    [Parameter(ParameterSetName='noOutPath')]
+    [parameter(ParameterSetName='noOutPathWithBsr')]
+    [parameter(ParameterSetName='noOutPathNoBsr')]
     [ValidatePattern('^(BE|DA|FS|GN|IF|LH|N[ABFO]|S[LS])$')]
     [string[]]$modifiers
 )
 
 $ErrorActionPreference = 'Stop'
+
+Set-Variable `
+    -Name InvalidFileNameRegex `
+    -Option Constant `
+    -Value "[$([regex]::Escape(([IO.Path]::GetInvalidFileNameChars() -join '')))]"
 
 ###
 
@@ -131,6 +147,31 @@ if (!$outPath) {
         throw 'Date or time not provided and could not be determined from input filename'
     }
 
+    if ($bsrId) {
+        $data = Invoke-RestMethod `
+            -Uri "https://maps.beatsaberplus.com/api/maps/detail/${bsrId}" `
+            -Headers @{'User-Agent' = 'ModAssistant'}
+
+        function CleanUp($str) {
+            if ($str) {
+                $str = $str.Trim()
+                while ($str -match '^(?:\(.*\)|\[.*\]|\{.*\})$') {
+                    $str = $str.Substring(1, $str.Length - 2).Trim();
+                }
+            }
+            return $str
+        }
+
+        $song = CleanUp($data.metadata.songName)
+        $subName = CleanUp($data.metadata.songSubName)
+        if ($subName) {
+            $song += " ($subName)"
+        }
+
+        $artist = CleanUp($data.metadata.songAuthorName)
+        $mapper = CleanUp($data.metadata.levelAuthorName)
+    }
+
     $components = New-Object System.Collections.ArrayList
     $components.Add($date) | Out-Null
     $components.Add($time) | Out-Null
@@ -169,7 +210,8 @@ if (!$outPath) {
     $components.Add($missesStr) | Out-Null
     $components.Add($rank) | Out-Null
 
-    $outPath = Join-Path $outDir "$($components -join ' - ').mkv"
+    $filename = "$($components -join ' - ').mkv" -replace $InvalidFileNameRegex, '_'
+    $outPath = Join-Path $outDir $filename
 }
 
 if (Test-PathsEqual $path $outPath) {

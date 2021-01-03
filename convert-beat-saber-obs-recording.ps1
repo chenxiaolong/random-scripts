@@ -150,7 +150,7 @@ if (!$outPath) {
     if ($bsrId) {
         $data = Invoke-RestMethod `
             -Uri "https://beatsaver.com/api/maps/detail/${bsrId}" `
-            -Headers @{'User-Agent' = 'ModAssistant'}
+            -Headers @{'User-Agent' = 'convert-beat-saber-obs-recording/0.0 (https://github.com/chenxiaolong/random-scripts/blob/master/convert-beat-saber-obs-recording.ps1)'}
 
         function CleanUp($str) {
             if ($str) {

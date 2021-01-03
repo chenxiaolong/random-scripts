@@ -149,7 +149,7 @@ if (!$outPath) {
 
     if ($bsrId) {
         $data = Invoke-RestMethod `
-            -Uri "https://maps.beatsaberplus.com/api/maps/detail/${bsrId}" `
+            -Uri "https://beatsaver.com/api/maps/detail/${bsrId}" `
             -Headers @{'User-Agent' = 'ModAssistant'}
 
         function CleanUp($str) {

@@ -41,7 +41,7 @@ param (
     # Level type
     [parameter(ParameterSetName='noOutPathWithBsr', Mandatory=$true)]
     [parameter(ParameterSetName='noOutPathNoBsr', Mandatory=$true)]
-    [ValidatePattern('^(((90|360)°|One Handed|Lawless) )?(Easy|Normal|Hard|Expert\+?)$')]
+    [ValidatePattern('^(((90|360)°|Lawless|Lightshow|No Arrows|One Handed) )?(Easy|Normal|Hard|Expert\+?)$')]
     [string]$difficulty,
     # Misses
     [parameter(ParameterSetName='noOutPathWithBsr', Mandatory=$true)]
@@ -59,18 +59,24 @@ param (
     #   - GN - Ghost Notes
     #   - NA - No Arrows
     #   - NB - No Bombs
-    #   - NF - No Fail
-    #   - NO - No Obstacles
+    #   - NW - No Walls
+    #   - SFS - Super Fast Song
     #   - SS - Slower Song
+    # - Sometimes score-impacting modifiers
+    #   - NF - No Fail TODO
     # - Non-score-impacting modifiers:
-    #   - BE - Battery Energy
-    #   - IF - Insta Fail
+    #   - 1L - 1 Life
+    #   - 4L - 4 Lives
+    #   - SA - Strict Angles
+    #   - SN - Small Notes
+    #   - PM - Pro Mode
+    #   - ZM - Zen Mode
     # - Player settings:
     #   - LH - Left Handed
     #   - SL - Static Lights
     [parameter(ParameterSetName='noOutPathWithBsr')]
     [parameter(ParameterSetName='noOutPathNoBsr')]
-    [ValidatePattern('^(BE|DA|FS|GN|IF|LH|N[ABFO]|S[LS])$')]
+    [ValidatePattern('^([14L]|DA|FS|GN|LH|N[ABFW]|PM|S([ALNS]|FS)|ZM)$')]
     [string[]]$modifiers
 )
 

@@ -77,7 +77,10 @@ param (
     [parameter(ParameterSetName='noOutPathWithBsr')]
     [parameter(ParameterSetName='noOutPathNoBsr')]
     [ValidatePattern('^([14L]|DA|FS|GN|LH|N[ABFW]|PM|S([ALNS]|FS)|ZM)$')]
-    [string[]]$modifiers
+    [string[]]$modifiers,
+    [parameter(ParameterSetName='noOutPathWithBsr')]
+    [parameter(ParameterSetName='noOutPathNoBsr')]
+    [string]$comment
 )
 
 $ErrorActionPreference = 'Stop'
@@ -215,6 +218,10 @@ if (!$outPath) {
 
     $components.Add($missesStr) | Out-Null
     $components.Add($rank) | Out-Null
+
+    if ($comment) {
+        $components.Add($comment) | Out-Null
+    }
 
     $filename = "$($components -join ' - ').mkv" -replace $InvalidFileNameRegex, '_'
     $outPath = Join-Path $outDir $filename

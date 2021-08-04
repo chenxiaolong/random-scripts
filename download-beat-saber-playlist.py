@@ -107,7 +107,7 @@ def main():
         if 'key' in song:
             key = song['key']
         else:
-            key = beatsaver_request(f'/maps/by-hash/{song_hash}')['key']
+            key = beatsaver_request(f'/maps/hash/{song_hash}')['key']
 
         beatsaver_uri = f'beatsaver://{key}/'
         print(f'- Invoking: {beatsaver_uri}')

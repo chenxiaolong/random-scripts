@@ -47,6 +47,10 @@ param (
     [parameter(ParameterSetName='noOutPathWithBsr', Mandatory=$true)]
     [parameter(ParameterSetName='noOutPathNoBsr', Mandatory=$true)]
     [int]$misses,
+    # No FC (when there are no misses)
+    [parameter(ParameterSetName='noOutPathWithBsr')]
+    [parameter(ParameterSetName='noOutPathNoBsr')]
+    [switch]$noFC,
     # Rank
     [parameter(ParameterSetName='noOutPathWithBsr', Mandatory=$true)]
     [parameter(ParameterSetName='noOutPathNoBsr', Mandatory=$true)]
@@ -211,7 +215,7 @@ if (!$outPath) {
 
     $missesStr = switch ($misses) {
         { $_ -lt 0 } { 'Failed' }
-        0 { 'Full Combo' }
+        0 { $noFC ? '0 misses' : 'Full Combo' }
         1 { '1 miss' }
         default { "$_ misses" }
     }

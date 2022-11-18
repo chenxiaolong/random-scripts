@@ -41,7 +41,7 @@ RE_RANK = re.compile(r'^([A-F]|S{1,3})$')
 #   - SL - Static Lights
 RE_MODIFIER = re.compile(r'^([14]L|DA|FS|GN|LH|N[ABFW]|PM|S([ALNS]|FS)|ZM)$')
 RE_OBS_FILENAME = re.compile(r'^(\d{4}-\d{2}-\d{2})\s*-?\s*(\d{2})')
-RE_TRIMMABLE = re.compile(r'^(?:\(.*\)|\[.*\]|\{.*\})$')
+RE_TRIMMABLE = re.compile(r'^(?:\(.*\)|\[.*\]|\{.*\}|【.*】)$')
 
 
 def valid_on_win_fs(c):

@@ -169,7 +169,7 @@ def parse_args():
             if any(a is None for a in mandatory_without_bsr_id):
                 parser.error('--song is required when --bsr-id is not specified')
 
-        if args.no_fc and misses != 0:
+        if args.no_fc and args.misses != 0:
             parser.error('--no-fc can only be used when --misses 0 is specified')
 
     return args

@@ -9,8 +9,13 @@ def parse_args():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('adb_arg', nargs='*',
                         help='Argument to pass to adb')
-    parser.add_argument('-p', '--package', default=[], action='append',
+
+    filter = parser.add_mutually_exclusive_group()
+
+    filter.add_argument('-p', '--package', default=[], action='append',
                         help='Filter by package')
+    filter.add_argument('-P', '--pid',
+                        help='Filter by PID')
 
     return parser.parse_args()
 
@@ -54,6 +59,7 @@ def main():
         '-v', 'year',
         '-v', 'zone',
         *(('--uid', ','.join(uids)) if uids else ()),
+        *(('--pid', args.pid) if args.pid else ()),
     ])
 
 

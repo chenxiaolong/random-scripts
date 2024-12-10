@@ -57,12 +57,16 @@ def update_step(step: ruamel.yaml.comments.CommentedMap) -> bool:
 
     print(f'- {uses} -> {new_uses} ({tag})')
 
-    # Trailing newlines are part of the "comment".
+    # Trailing newlines and comments are part of the "comment". Only discard the
+    # data up until the first newline.
+    suffix = ''
     if 'uses' in step.ca.items and step.ca.items['uses'][2]:
         comment = step.ca.items['uses'][2].value
-        suffix = comment[len(comment.rstrip()):]
-    else:
-        suffix = ''
+        try:
+            newline = comment.index('\n')
+            suffix = comment[newline:]
+        except ValueError:
+            pass
 
     step['uses'] = new_uses
     step.yaml_add_eol_comment(tag + suffix, 'uses', column=0)

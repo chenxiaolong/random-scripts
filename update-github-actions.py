@@ -51,7 +51,7 @@ def update_step(step: ruamel.yaml.comments.CommentedMap) -> bool:
 
     tag, commit = get_latest_tag(repo_path)
 
-    new_uses = f'{repo_path}@{commit}'
+    new_uses = f'{action_path}@{commit}'
     if new_uses == uses:
         return False
 

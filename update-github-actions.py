@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import argparse
+import functools
 import pathlib
 
 import requests
@@ -11,28 +12,21 @@ import ruamel.yaml
 import ruamel.yaml.comments
 
 
-TAG_CACHE = {}
-
-
+@functools.cache
 def get_latest_tag(repo_path: str) -> tuple[str, str]:
-    global TAG_CACHE
+    r = requests.get(f'https://api.github.com/repos/{repo_path}/releases/latest')
+    r.raise_for_status()
 
-    if repo_path not in TAG_CACHE:
-        r = requests.get(f'https://api.github.com/repos/{repo_path}/releases/latest')
-        r.raise_for_status()
+    tag_name = r.json()['tag_name']
 
-        tag_name = r.json()['tag_name']
+    r = requests.get(
+        f'https://api.github.com/repos/{repo_path}/commits/refs/tags/{tag_name}',
+        headers={'Accept': 'application/vnd.github.sha'},
+    )
 
-        r = requests.get(
-            f'https://api.github.com/repos/{repo_path}/commits/refs/tags/{tag_name}',
-            headers={'Accept': 'application/vnd.github.sha'},
-        )
+    commit = r.text
 
-        commit = r.text
-
-        TAG_CACHE[repo_path] = (tag_name, commit)
-
-    return TAG_CACHE[repo_path]
+    return (tag_name, commit)
 
 
 def update_step(step: ruamel.yaml.comments.CommentedMap) -> bool:

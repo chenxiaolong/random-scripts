@@ -251,6 +251,7 @@ def main():
         *timestamp_args,
         '-i', args.input,
         '-c', 'copy',
+        '-map', '0',
         '-avoid_negative_ts', '1',
         args.output,
     ])

@@ -74,7 +74,7 @@ def open_with_chmod(parent: ParentContext, child: ChildContext) -> int:
 
             try:
                 child_stat = os.lstat(child.name, dir_fd=parent.fd)
-                child_mode = stat.S_IMODE(child_stat.st_mode) | stat.S_IWUSR
+                child_mode = stat.S_IMODE(child_stat.st_mode) | stat.S_IRUSR
                 os.chmod(child.name, child_mode, dir_fd=parent.fd)
             except OSError as chmod_e:
                 log_error('Failed to make writable', parent.name, child.name, chmod_e)

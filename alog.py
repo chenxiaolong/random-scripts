@@ -9,6 +9,8 @@ def parse_args():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('adb_arg', nargs='*',
                         help='Argument to pass to adb')
+    parser.add_argument('-u', '--user', type=int, default=0,
+                        help='Android user ID')
 
     filter = parser.add_mutually_exclusive_group()
 
@@ -30,7 +32,7 @@ def main():
             'adb',
             *args.adb_arg,
             'shell',
-            'pm', 'list', 'packages', '-U',
+            'pm', 'list', 'packages', '-U', '--user', str(args.user)
         ])
         package_to_uid = {}
 

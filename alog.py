@@ -2,6 +2,7 @@
 
 import argparse
 import subprocess
+import sys
 
 
 def parse_args():
@@ -50,11 +51,15 @@ def main():
             else:
                 raise ValueError(f'Invalid package: {package}')
 
+    color_args = []
+    if sys.stdout.isatty():
+        color_args = ['-v', 'color']
+
     subprocess.check_call([
         'adb',
         *args.adb_arg,
         'logcat',
-        '-v', 'color',
+        *color_args,
         '-v', 'printable',
         '-v', 'time',
         '-v', 'usec',

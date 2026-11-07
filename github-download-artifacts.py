@@ -1,17 +1,30 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: 2025 Andrew Gunnerson
+# SPDX-FileCopyrightText: 2025-2026 Andrew Gunnerson
 # SPDX-License-Identifier: GPL-3.0-only
 
 import argparse
 import dataclasses
-import functools
 import hashlib
 import os
 import pathlib
-import typing
+import urllib.parse
 
 import requests
+
+
+def parse_url(url: str) -> tuple[str, int]:
+    parsed = urllib.parse.urlparse(url)
+
+    if parsed.scheme != 'https' or parsed.netloc != 'github.com':
+        raise ValueError(f'Not a GitHub URL: {url}')
+
+    pieces = parsed.path.split('/')
+
+    if len(pieces) < 6 or pieces[0] or pieces[3] != 'actions' or pieces[4] != 'runs':
+        raise ValueError(f'Not a GitHub Actions run: {url}')
+
+    return f'{pieces[1]}/{pieces[2]}', int(pieces[5])
 
 
 @dataclasses.dataclass
@@ -84,14 +97,16 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-r', '--repo',
-        required=True,
         help='GitHub repo slug',
     )
     parser.add_argument(
         '-n', '--number',
-        required=True,
         type=int,
-        help='Github Actions build number',
+        help='GitHub Actions build number',
+    )
+    parser.add_argument(
+        '-u', '--url',
+        help='GitHub Actions run URL',
     )
     parser.add_argument(
         '-d', '--directory',
@@ -110,7 +125,20 @@ def parse_args():
         help='Environment variable containing Github token',
     )
 
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    has_repo = args.repo is not None
+    has_number = args.number is not None
+    has_url = args.url is not None
+
+    if not (has_repo and has_number) and not has_url:
+        parser.error('Either -u or -r + -n is required')
+    elif (has_repo and has_number) == has_url:
+        parser.error('-u and -r + -n are mutually exclusive')
+    elif has_repo != has_number:
+        parser.error('-r and -n must be used together')
+
+    return args
 
 
 def main():
@@ -127,7 +155,13 @@ def main():
     session = requests.Session()
     session.headers['Authorization'] = f'Bearer {token}'
 
-    artifacts = list_artifacts(session, args.repo, args.number)
+    if args.url is not None:
+        repo, number = parse_url(args.url)
+    else:
+        repo = args.repo
+        number = args.number
+
+    artifacts = list_artifacts(session, repo, number)
 
     for artifact in artifacts:
         print('Downloading:', artifact.name)
